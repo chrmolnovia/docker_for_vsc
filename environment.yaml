@@ -1,0 +1,6 @@
+name: app_env
+channels:
+  - defaults
+dependencies:
+  - pip:
+    - gradio
