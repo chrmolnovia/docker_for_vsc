@@ -68,4 +68,4 @@
 
 # Develop in docker container remote
 - connect to remote host
-- create .devcontainer/devcontainer.json (exclude gpu flag!) 
+- create .devcontainer/devcontainer.json 
