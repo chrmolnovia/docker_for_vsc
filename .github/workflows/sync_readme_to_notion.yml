@@ -1,0 +1,92 @@
+name: Sync README to Notion
+
+on:
+  workflow_dispatch: # Allow manual trigger
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'README.md'
+
+jobs:
+  sync_readme_to_notion:
+    runs-on: ubuntu-latest
+    name: Sync README to Notion
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main  # Explicitly checkout the main branch
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Update Notion Page
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+        run: |
+          # Install the Notion SDK
+          npm install @notionhq/client
+
+          # Create a simple script to update Notion
+          cat > update-notion.js << 'EOF'
+          const { Client } = require('@notionhq/client');
+          const fs = require('fs');
+
+          const notion = new Client({ auth: process.env.NOTION_TOKEN });
+          const pageId = process.env.NOTION_PAGE_ID;
+          
+          async function updatePage() {
+            try {
+              // Read README content
+              const readmeContent = fs.readFileSync('README.md', 'utf8');
+              
+              // First, clear existing content by archiving blocks
+              const { results } = await notion.blocks.children.list({ block_id: pageId });
+              for (const block of results) {
+                await notion.blocks.update({
+                  block_id: block.id,
+                  archived: true
+                });
+              }
+              
+              // Update the page with new content
+              await notion.pages.update({
+                page_id: pageId,
+                properties: {
+                  title: {
+                    title: [{ text: { content: "README" } }]
+                  }
+                }
+              });
+              
+              // Add the README content as a code block with markdown
+              await notion.blocks.children.append({
+                block_id: pageId,
+                children: [
+                  {
+                    object: "block",
+                    type: "code",
+                    code: {
+                      language: "markdown",
+                      rich_text: [{ type: "text", text: { content: readmeContent } }]
+                    }
+                  }
+                ]
+              });
+              
+              console.log('Successfully updated Notion page');
+            } catch (error) {
+              console.error('Error updating Notion page:', error);
+              process.exit(1);
+            }
+          }
+          
+          updatePage();
+          EOF
+          
+          # Run the script
+          node update-notion.js
