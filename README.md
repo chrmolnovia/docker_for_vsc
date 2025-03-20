@@ -1,4 +1,4 @@
-# Hand on intro to docker in vscode
+# Hands on intro to docker in vscode
 
 1. [docker in command line](docker_in_cmd.md)
 2. [docker in vscode](docker_in_vsc.md)
