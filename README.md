@@ -7,7 +7,7 @@
 - Image: read-only template for instructions to create a docker container. Mostly based on another image
 - Container: runnable instance of an image
 
-## VM vs Container
+## VM vs. Container
 ![alt docker vs vm](media/dockervsvm.png)
 
 
