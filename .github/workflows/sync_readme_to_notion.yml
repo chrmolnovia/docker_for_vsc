@@ -15,9 +15,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Sync README to Notion
-        uses: Novia-RDI-Seafaring/notion-sync-action@v1.0.2
+        uses: Novia-RDI-Seafaring/notion-sync-action@main
         with:
           notion_token: ${{ secrets.NOTION_TOKEN }}
           notion_page_id: ${{ secrets.NOTION_PAGE_ID }}
